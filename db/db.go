@@ -35,8 +35,6 @@ type VenueId struct {
 	Id int `json:"id"`
 }
 
-var myTrue = true
-
 var mongoClient Client
 
 func NewClient(dbConn string, timeoutSecs int, dbName string, itinerariesCollection string, venuesCollection string) Client {
