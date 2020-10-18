@@ -16,6 +16,7 @@ type Client interface {
 	Disconnect()
 	SaveVenue(venue *model.Venue) error
 	GetVenue(id int) *model.Venue
+	GetVenues() []*model.Venue
 }
 
 type client struct {
@@ -43,10 +44,10 @@ func NewClient(dbConn string, timeoutSecs int, dbName string, itinerariesCollect
 		return mongoClient
 	}
 	mongoClient = &client{
-		connected:             false,
-		uri:                   dbConn,
-		timeoutSecs:           timeoutSecs,
-		dbName:                dbName,
+		connected:                 false,
+		uri:                       dbConn,
+		timeoutSecs:               timeoutSecs,
+		dbName:                    dbName,
 		itinerariesCollectionName: itinerariesCollection,
 		venuesCollectionName:      venuesCollection,
 	}
@@ -68,7 +69,7 @@ func (c *client) Connect() error {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * time.Duration(c.timeoutSecs))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(c.timeoutSecs))
 	err = c.mongoCli.Connect(ctx)
 	cancel()
 
@@ -87,7 +88,7 @@ func (c *client) Disconnect() {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * time.Duration(c.timeoutSecs))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(c.timeoutSecs))
 	err := c.mongoCli.Disconnect(ctx)
 	cancel()
 	if err != nil {
@@ -108,18 +109,18 @@ func (c *client) SaveVenue(venue *model.Venue) error {
 	filterVenue := &VenueId{Id: venue.Id}
 	upsertVenue := bson.M{
 		"$set": bson.M{
-			"Name": venue.Name,
-			"Abbr": venue.Abbr,
-			"Address": venue.Address,
-			"PhoneNo": venue.PhoneNo,
-			"AvatarUrl": venue.AvatarUrl,
+			"Name":       venue.Name,
+			"Abbr":       venue.Abbr,
+			"Address":    venue.Address,
+			"PhoneNo":    venue.PhoneNo,
+			"AvatarUrl":  venue.AvatarUrl,
 			"CoverPhoto": venue.CoverPhoto,
-			"InfoUrl": venue.InfoUrl,
-			"Notes": venue.Notes,
+			"InfoUrl":    venue.InfoUrl,
+			"Notes":      venue.Notes,
 		},
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * time.Duration(c.timeoutSecs))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(c.timeoutSecs))
 	updateResult, err := c.venuesCollection.UpdateOne(ctx, filterVenue, upsertVenue, options.Update().SetUpsert(true))
 	cancel()
 
@@ -136,7 +137,7 @@ func (c *client) GetVenue(id int) *model.Venue {
 		return nil
 	}
 	venueId := &VenueId{Id: id}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second * time.Duration(c.timeoutSecs))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(c.timeoutSecs))
 	result := c.venuesCollection.FindOne(ctx, venueId)
 	cancel()
 
@@ -150,4 +151,29 @@ func (c *client) GetVenue(id int) *model.Venue {
 		return nil
 	}
 	return venue
+}
+
+func (c *client) GetVenues() []*model.Venue {
+	if !c.connected {
+		return nil
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(c.timeoutSecs))
+	defer cancel()
+
+	cursor, err := c.venuesCollection.Find(ctx, bson.D{})
+	if err != nil {
+		return nil
+	}
+
+	var venues []*model.Venue
+	for cursor.Next(ctx) {
+		var venue model.Venue
+		err := cursor.Decode(&venue)
+		if err != nil {
+			log.WithError(err).Error("Error decoding venue")
+		}
+		venues = append(venues, &venue)
+	}
+	return venues
 }
