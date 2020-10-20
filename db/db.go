@@ -175,3 +175,25 @@ func (c *client) GetVenues() []*model.Venue {
 	}
 	return venues
 }
+
+func (c *client) DeleteVenue(id int) error {
+	if !c.connected {
+		return fmt.Errorf("not connected")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(c.timeoutSecs))
+	defer cancel()
+
+	venueId := &VenueId{Id: id}
+
+	result, err := c.venuesCollection.DeleteOne(ctx, venueId)
+	if err != nil {
+		return err
+	}
+
+	if result.DeletedCount < 1 {
+		log.Warnf("Delete called for nonexistent venue ID %d", id)
+	}
+
+	return nil
+}
