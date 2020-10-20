@@ -17,6 +17,7 @@ type Client interface {
 	SaveVenue(venue *model.Venue) error
 	GetVenue(id int) *model.Venue
 	GetVenues() []*model.Venue
+	DeleteVenue(id int) error
 }
 
 type client struct {
