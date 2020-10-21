@@ -21,7 +21,7 @@ type Info struct {
 
 type Attraction struct {
 	Date    string   `json:"date"`
-	VenueId string   `json:"venueId"`
+	VenueId int      `json:"venueId"`
 	Notes   []string `json:"notes,omitempty"`
 }
 
@@ -29,14 +29,14 @@ type HotelStay struct {
 	CheckInDate    string   `json:"checkInDate"`
 	CheckOutDate   string   `json:"checkOutDate"`
 	ConfirmationNo string   `json:"confirmationNo"`
-	VenueId        string   `json:"venueId"`
+	VenueId        int      `json:"venueId"`
 	Notes          []string `json:"notes,omitempty"`
 }
 
 type DiningReservation struct {
 	Date           string   `json:"date"`
 	ConfirmationNo string   `json:"confirmationNo"`
-	VenueId        string   `json:"venueId"`
+	VenueId        int      `json:"venueId"`
 	Notes          []string `json:"notes,omitempty"`
 }
 
@@ -44,9 +44,9 @@ type Flight struct {
 	Airline          string   `json:"airline"`
 	FlightNumber     string   `json:"flightNumber"`
 	DepartureDate    string   `json:"departureDate"`
-	DepartureVenueId string   `json:"departureVenueId,omitempty"`
+	DepartureVenueId int      `json:"departureVenueId,omitempty"`
 	ArrivalDate      string   `json:"arrivalDate,omitempty"`
-	ArrivalVenueId   string   `json:"arrivalVenueId"`
+	ArrivalVenueId   int      `json:"arrivalVenueId"`
 	Terminal         string   `json:"terminal,omitempty"`
 	BaggageClaim     string   `json:"baggageClaim,omitempty"`
 	RecordLocator    string   `json:"recordLocator,omitempty"`
