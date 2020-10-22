@@ -24,6 +24,7 @@ var loadCmd = &cobra.Command{
 
 		typeLoaders = make(map[string]load.Loader)
 		typeLoaders["venue"] = load.NewVenueLoader(db.GetClient())
+		typeLoaders["itinerary"] = load.NewItineraryLoader(db.GetClient())
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		loader, ok := typeLoaders[loadType]

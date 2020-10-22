@@ -16,8 +16,18 @@ type venueLoader struct {
 	client db.Client
 }
 
+type itineraryLoader struct {
+	client db.Client
+}
+
 func NewVenueLoader(client db.Client) Loader {
 	return &venueLoader{
+		client: client,
+	}
+}
+
+func NewItineraryLoader(client db.Client) Loader {
+	return &itineraryLoader{
 		client: client,
 	}
 }
@@ -44,5 +54,16 @@ func (l *venueLoader) LoadFile(file string) error {
 		}
 		log.WithField("venue-id", venue.Id).Info("Venue Saved")
 	}
+	return nil
+}
+
+func (l *itineraryLoader) LoadFile(file string) error {
+	err := l.client.SaveItinerary(&dummyItineraries[0])
+	if err != nil {
+		log.WithError(err).Errorf("Error loading itinerary data")
+		return err
+	}
+	log.Infof("Done")
+
 	return nil
 }

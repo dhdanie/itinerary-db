@@ -18,6 +18,10 @@ type Client interface {
 	GetVenue(id int) *model.Venue
 	GetVenues() []*model.Venue
 	DeleteVenue(id int) error
+	SaveItinerary(itinerary *model.Itinerary) error
+	GetItinerary(id string) *model.Itinerary
+	GetItineraries() []*model.Itinerary
+	DeleteItinerary(id string) error
 }
 
 type client struct {
